@@ -63,7 +63,7 @@ void doEncoderB(){
       rotating = false;
   }
 }
-void Sosanh()
+/*void Sosanh()
 {   
          if(digitalRead(button))
            { //delay(300);
@@ -79,4 +79,6 @@ void Sosanh()
     else { 
       digitalWrite(relay,HIGH);
   }
- }
+ }*/
+
+
