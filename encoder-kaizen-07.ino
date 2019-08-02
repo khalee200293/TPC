@@ -77,30 +77,6 @@ void doEncoderB(){
       rotating = false;
   }
 }
-/*void Sosanh()
-{   
-         if(digitalRead(button))
-           { if( (unsigned long) (newtime - time2) == 500 )
-              {
-                  if(vantoc ==0)
-                  {
-                    if( (unsigned long) (millis() - time1) == 300 )
-                    {
-                       if(vantoc ==0)
-                       {
-                         digitalWrite(relay, LOW);
-                        }                           
-                       time1=millis();        
-                    } 
-                  }
-              } 
-                else{digitalWrite(relay,HIGH);}         
-           
-            }
-    else { // ngược lại
-      digitalWrite(relay,HIGH);
-         }
- }*/
 
  void Sosanh()
   {
@@ -113,11 +89,17 @@ void doEncoderB(){
                       {
                         time2=newtime;
                         if( (unsigned long) (newtime - time2) == 500 )
+                            {
+                              if(vantoc ==0)
+                              {
+                                  digitalWrite(relay, LOW);
+                              }
+                            }
+                         else{digitalWrite(relay,HIGH);} 
                       }
+                      else{digitalWrite(relay,HIGH);}
                     }
-                else{digitalWrite(relay,HIGH);} 
+                //else{digitalWrite(relay,HIGH);} 
            }
-    else { // ngược lại
-      digitalWrite(relay,HIGH);
-         }
+        else {digitalWrite(relay,HIGH);}
   }
