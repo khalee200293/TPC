@@ -1,20 +1,18 @@
 
-#define  encoderPinA  2 
-#define  encoderPinB  3
-#define  relay  7 
+#define  encoderPinA  2 //5,2
+#define  relay  7
+#define  encoderPinB  3 //4,3
 volatile  int encoderPos = 0;  
-int lastReportedPos = 1; 
+
+ int lastReportedPos = 1;
+ int button = 8; 
+ unsigned long time1;
+ unsigned long time2;
+
 static boolean rotating=false;
 boolean A_set = false;             
 boolean B_set = false;
-
-unsigned long time1 = 0;
-unsigned long time2 = 0;
-unsigned long time3 = 0;
-unsigned long time4 = 0;
-
  int newposition;
- int button = 8;
  int oldposition=0;
  long newtime;
  long oldtime=0;
@@ -26,8 +24,7 @@ unsigned long time4 = 0;
         pinMode(encoderPinA, INPUT_PULLUP);      
         pinMode(encoderPinB, INPUT_PULLUP);
         pinMode(relay, OUTPUT);  
-        //pinMode(LED_BUILTIN, OUTPUT);
-        pinMode(button, INPUT);
+        pinMode(button, INPUT);      
         attachInterrupt(0, doEncoderA, CHANGE);     
         attachInterrupt(1, doEncoderB, CHANGE);
         Serial.begin(9600);  
@@ -40,18 +37,13 @@ void loop() {
    detachInterrupt(0);
    detachInterrupt(1);
    vantoc = (newposition-oldposition)*60/1000;
-
-   /*if((unsigned long) (newtime - time1) == 500)
-     {
-       time1=newtime;
-     }*/
-   
-   Serial.println(vantoc);
-   Sosanh();
+    //Serial.println(time1);
+    //Serial.println(vantoc,DEC);
     oldposition=newposition;
     oldtime=newtime;
     attachInterrupt(0, doEncoderA, CHANGE);
     attachInterrupt(1, doEncoderB, CHANGE); 
+    sosanh();
 }
 void doEncoderA(){
   if ( rotating ) delay (1);
@@ -61,10 +53,8 @@ void doEncoderA(){
     if ( A_set && !B_set )
       encoderPos += 1;
       ganxung += 1;
-      //sovong=encoderPos/20;
       sovong=encoderPos/1000;
-    //if (ganxung == 42){ganxung=0;}
-    if (ganxung == 200){ganxung=0;}
+    if (ganxung == 42){ganxung=0;}
     rotating = false;
       }
   }
@@ -78,28 +68,42 @@ void doEncoderB(){
   }
 }
 
- void Sosanh()
+void sosanh()
+{
+  if(digitalRead(button))
   {
-         if(digitalRead(button))
-           {
-              time1=newtime;
-                if( (unsigned long) (newtime - time1) == 500 )
-                    {
-                      if(vantoc ==0)
-                      {
-                        time2=newtime;
-                        if( (unsigned long) (newtime - time2) == 500 )
-                            {
-                              if(vantoc ==0)
-                              {
-                                  digitalWrite(relay, LOW);
-                              }
-                            }
-                         else{digitalWrite(relay,HIGH);} 
-                      }
-                      else{digitalWrite(relay,HIGH);}
-                    }
-                //else{digitalWrite(relay,HIGH);} 
-           }
-        else {digitalWrite(relay,HIGH);}
+       time2 = (time2 + 1) % 50;
+       if(time2>=1)
+       {
+               if(vantoc ==0)
+               {
+                   time1 = (time1 + 1) % 50;
+                   if(time1>=3)
+                   {
+                       if(vantoc ==0)
+                         {
+                           digitalWrite(relay, LOW);
+                         }
+                       else{digitalWrite(relay,HIGH);}
+                   }
+                   else{digitalWrite(relay,HIGH);}
+               }
+               else 
+               {
+                digitalWrite(relay,HIGH);
+                time1=0;
+               }                 
+       }
+       else 
+         {
+          digitalWrite(relay,HIGH);
+          time1=0;
+         }     
   }
+  else 
+    {
+      digitalWrite(relay,HIGH);
+      time1=0;
+      time2=0;
+    }
+}
